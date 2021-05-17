@@ -17,6 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
+		'userId',
         'name',
         'email',
         'password',
@@ -39,5 +40,11 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+		'userId' => 'string',
     ];
+	
+	public function embeddings()
+	{
+		return $this->hasMany('App\Models\Embedding', 'userId', 'userId');
+	}
 }
