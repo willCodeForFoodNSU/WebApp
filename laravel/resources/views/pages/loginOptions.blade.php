@@ -20,7 +20,7 @@
 							<div class="form-group">
 								<label for="password">Login Using Password</label>
 								<input type="hidden" name="email" value="{{ $email }}" />
-								<input type="password" class="form-control" name="password" id="password" placeholder="Enter email">
+								<input type="password" class="form-control" name="password" id="password" placeholder="Password">
 							</div>
 							<button type="submit" class="btn btn-primary float-right" style="width:100%">Login</button>
 						</form>

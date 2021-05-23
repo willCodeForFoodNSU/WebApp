@@ -9,6 +9,9 @@ import torch.nn as nn
 from torch.utils import data
 
 from model_RawNet2 import RawNet2
+
+import glob
+
 #from parser import get_args
 
 #from parser import *
@@ -30,8 +33,8 @@ def get_args():
     parser = argparse.ArgumentParser()
     #dir
     parser.add_argument('-name', type = str, default = 'rawnet2_vox2')
-    parser.add_argument('-save_dir', type = str, default = 'C:/xampp/htdocs/SpeakerRecognition/python_scripts/embeddings/')
-    parser.add_argument('-DB', type = str, default = 'C:/xampp/htdocs/SpeakerRecognition/python_scripts/')
+    parser.add_argument('-save_dir', type = str, default = '../python_scripts/embeddings/')
+    parser.add_argument('-DB', type = str, default = '../python_scripts/')
     parser.add_argument('-DB_vox2', type = str, default = '/media/ai/GAMMA/VoxCeleb/voxceleb2/')
     parser.add_argument('-dev_wav', type = str, default = 'dev_wav/')
     parser.add_argument('-val_wav', type = str, default = 'single_user/')
@@ -90,6 +93,7 @@ def get_args():
 # from scipy.optimize import brentq
 # from scipy.interpolate import interp1d
 
+
 def cos_sim(a,b):
     return np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
@@ -98,17 +102,30 @@ def get_utt_list(src_dir):
     Designed for VoxCeleb
     '''
     l_utt = []
-    for path, dirs, files in os.walk(src_dir):
+    filename = src_dir.split("/")[-2]
+    #src_dir = src_dir.split("\\")[-1]
+    
+    l_utt.append(filename + ".wav")
+    
+    '''
+    #for path, dirs, files in os.walk(src_dir):
+    for file in glob.glob(src_dir + "*.wav"):
+        file = file.replace("\\", "/")
+        file = file.split("/")[-1]
         # #base = '/'.join(path.split('/')[-2:])+'/'
         # base = '/'.join(path.split('/')[-2:])+'/'
         # print(base)
-        for file in files:
-            if file[-3:] != 'wav':
-                continue
-            # l_utt.append(base+file)
-            l_utt.append(file)
-            
+        #for file in files:
+        #if file[-3:] != 'wav':
+        #    continue
+        # l_utt.append(base+file)
+        l_utt.append(file)
+    print(l_utt) 
+    '''
     return l_utt
+    
+    
+    
 
 
 class TA_Dataset_VoxCeleb2(data.Dataset):
@@ -255,25 +272,27 @@ def main():
     print('nb_params: {}'.format(nb_params))
 
     model.eval()
+    
     with torch.set_grad_enabled(False):
         #1st, extract speaker embeddings.
         l_embeddings = []
-        with tqdm(total = len(db_gen), ncols = 70) as pbar:
-            for m_batch in db_gen:
-                l_code = []
-                for batch in m_batch:
-                    batch = batch.to(device)
-                    code = model(x = batch, is_test=True)
-                    l_code.extend(code.cpu().numpy())
-                l_embeddings.append(np.mean(l_code, axis=0))
-                pbar.update(1)
-        d_embeddings = {}
+        #with tqdm(total = len(db_gen), ncols = 70) as pbar:
+        for m_batch in db_gen:
+            l_code = []
+            for batch in m_batch:
+                batch = batch.to(device)
+                code = model(x = batch, is_test=True)
+                l_code.extend(code.cpu().numpy())
+            l_embeddings.append(np.mean(l_code, axis=0))
+            
 
+        d_embeddings = {}
+        
         if not len(l_utt) == len(l_embeddings):
             print(len(l_utt), len(l_embeddings))
             exit()
         for k, v in zip(l_utt, l_embeddings):
-            print(v)
+            #print(v)
             f_embd = open("../embeddings/" + k.replace(".wav",".txt"), 'w', buffering = 1)
             d_embeddings[k] = v
 

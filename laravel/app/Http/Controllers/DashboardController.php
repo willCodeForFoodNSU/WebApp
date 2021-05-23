@@ -31,29 +31,26 @@ class DashboardController extends Controller
     public function voiceNewSubmit(Request $request)
     {
         $filename = auth()->user()->userId . "_"  . uniqid();
-        mkdir($filename);
         
+        mkdir($filename);
         $request->audio_data->move(('../audio_files/new/' . $filename), $filename . '.wav');
-
-        $process = new Process(["py", "../python_scripts/generate_embd.py", "-val_wav", '"../audio_files/new/'. $filename . '/"']);
+        
+        $process = new Process(["py", "../python_scripts/generate_embd.py", "-val_wav", '../audio_files/new/'. $filename . '/']);
+        $process->setTimeout(2 * 36000000);
         $process->run();
-
-        //shell_exec('py", "../python_scripts/generate_embd.py -val_wav "../audio_files/new/'. $filename . '/');
         
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-
-        echo "<pre>";
-        echo $data = $process->getOutput();
-        echo "</pre>";
-
+        
         $embedding = new \App\Models\Embedding;
         $embedding->userId = auth()->user()->userId;
         $embedding->embeddingId = $filename;
 
-        $f = "../embeddings/" . $filename . "/" . $filename . ".txt";
-				
+        $f = "../embeddings/" . $filename . ".txt";
+		
+        //echo $f ."\r\n";
+
         $myfile = fopen($f, "r") or die("Unable to open file!");
         $content = fread($myfile,filesize($f));
         fclose($myfile);

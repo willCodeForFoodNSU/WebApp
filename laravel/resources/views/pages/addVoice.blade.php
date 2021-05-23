@@ -1,6 +1,10 @@
 @extends('layout')
 
 @section('content')	
+<?php
+	$url = url('dashboard/voice/add');
+	//$url = str_replace("http", "https", $url);
+?>
 	<div class="container" style="margin-top:20px;">
 		<div class="row">
 			<div class="col-lg-4">
@@ -21,7 +25,7 @@
 							});
 						});
 						
-						submit_path = "{{ url('dashboard/voice/add') }}";
+						submit_path = "{{ url($url) }}";
 					</script>
 					<h5 class="card-title">Adding new voice sample</h5>
 						<div class="card-body">

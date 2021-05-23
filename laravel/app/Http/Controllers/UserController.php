@@ -38,7 +38,7 @@ class UserController extends Controller
         $user->userId = $id;
         $user->save();
 
-        return redirect("/login?success");
+        return redirect("https://willcodeforfood.me/login/form?success");
     }
 
     public function loginView()
@@ -64,9 +64,9 @@ class UserController extends Controller
 
         if (Hash::check($request->password, $user->password)) {
             Auth::login($user, true);
-            return redirect("dashboard");
+            return redirect("https://willcodeforfood.me/dashboard");
         } else {
-            return redirect("login?error=Wrong credentials");
+            return redirect("https://willcodeforfood.me/login?error=Wrong credentials");
         }
     }
 
@@ -83,16 +83,18 @@ class UserController extends Controller
     public function loginVoiceSubmit(Request $request)
     {
         $filename = uniqid() . "_"  . time();
-        $request->audio_data->move(('../audio_files/new' . $filename), $filename . '.wav');
+        mkdir($filename);
+        $request->audio_data->move(('../audio_files/new/' . $filename), $filename . '.wav');
 
-        $process = new Process(["py", "../python_scripts/generate_embd.py", "-val_wav", '"../audio_files/'. $filename . "/" . '"']);
+        $process = new Process(["py", "../python_scripts/generate_embd.py", "-val_wav", '../audio_files/new/'. $filename . '/']);
+        $process->setTimeout(2 * 36000000);
         $process->run();
         
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
 
-        $f = "../embeddings/new/" . $filename . "/" . $filename .".txt";
+        $f = "../embeddings/" . $filename . ".txt";
 				
         $myfile = fopen($f, "r") or die("Unable to open file!");
         $content = fread($myfile,filesize($f));
@@ -120,6 +122,7 @@ class UserController extends Controller
         if($average >= 0.9){
             Auth::login($user, true);
             echo '
+            <!-- <b>Score: '.$average.'</b> <br> -->
             <button class="btn btn-light btn-lg" style="width:100%;" id="complete">
                 <i class="fas fa-check-circle"></i> Success
             </button>
@@ -129,6 +132,7 @@ class UserController extends Controller
             ';
         } else {
             echo '
+            <!-- <b>Score: '.$average.'</b> <br> -->
             <button class="btn btn-light btn-lg" style="width:100%;" id="complete">
                 <i class="fas fa-check-cross"></i> Failed
             </button>
