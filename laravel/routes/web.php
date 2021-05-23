@@ -50,3 +50,5 @@ Route::get('dashboard/voice/add', '\App\Http\Controllers\DashboardController@voi
 Route::post('dashboard/voice/add', '\App\Http\Controllers\DashboardController@voiceNewSubmit');
 
 Auth::routes();
+
+URL::forceScheme('https');

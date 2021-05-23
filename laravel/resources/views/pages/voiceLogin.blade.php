@@ -1,6 +1,10 @@
 @extends('layout')
 
 @section('content')	
+<?php
+	$url = url('login/voice/submit?email=' . $email);
+	//$url = str_replace("http", "https", $url);
+?>
 	<div class="container" style="margin-top:20px;">
 		<div class="row">
 			<div class="col-lg-4">
@@ -21,7 +25,7 @@
 							});
 						});
 						
-						submit_path = "{{ url('login/voice/submit?email=' . $email) }}";
+						submit_path = "{{ $url }}";
 					</script>
 					<h5 class="card-title">Login</h5>
 						<div class="card-body">
