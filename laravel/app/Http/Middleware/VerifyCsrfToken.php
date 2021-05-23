@@ -13,5 +13,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         //
+        'record', 'dashboard/voice/add', 'login/voice/submit', 'identify/submit'
     ];
 }
